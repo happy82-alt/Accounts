@@ -1,0 +1,167 @@
+/* General Reset */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to right, #1e3c72, #2a5298);
+  color: white;
+}
+
+/* Navigation Bar */
+nav {
+  background: #111;
+  padding: 15px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+nav button {
+  background: #0284C7;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  white-space: nowrap;
+}
+nav button:hover {
+  background: #0369A1;
+}
+
+/* Section Styling */
+.section {
+  display: none;
+  max-width: 960px;
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+.active {
+  display: block;
+}
+
+/* Form Elements */
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: none;
+}
+
+/* Primary Button */
+button.action {
+  background: #34D399;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 7px;
+  font-weight: bold;
+  cursor: pointer;
+  color: black;
+  margin-top: 15px;
+}
+button.action:hover {
+  background: #059669;
+  color: white;
+}
+
+/* Small Buttons */
+.small-btn {
+  background: #3b82f6;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  margin-top: 8px;
+}
+.small-btn:hover {
+  background: #2563eb;
+}
+
+/* Labels */
+label {
+  font-weight: bold;
+}
+
+/* Marketplace Filter Row */
+.filter-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-row > * {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Post Card Styling */
+.post-card {
+  background: rgba(255, 255, 255, 0.15);
+  margin-bottom: 15px;
+  border-radius: 10px;
+  padding: 15px;
+  border-left: 4px solid #34d399;
+}
+.gallery {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-top: 10px;
+}
+.gallery img {
+  height: 80px;
+  border-radius: 6px;
+}
+video {
+  width: 100%;
+  max-height: 240px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+/* Login/Register Container */
+.container {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 30px;
+  border-radius: 10px;
+  width: 320px;
+}
+.container h2 {
+  text-align: center;
+}
+.container input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: none;
+}
+.container button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background: #34d399;
+  border: none;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.container button:hover {
+  background: #059669;
+  color: white;
+}
+.toggle-link {
+  margin-top: 10px;
+  text-align: center;
+  cursor: pointer;
+  color: #34d399;
+}
+.error {
+  color: #ff6666;
+  margin-top: 10px;
+}
