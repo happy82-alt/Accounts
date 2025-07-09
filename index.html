@@ -1,708 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>GameVault – Game Account Marketplace</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: linear-gradient(to right, #1e3c72, #2a5298);
-      color: #fff;
-    }
-
-    nav {
-      background: #111;
-      padding: 15px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    nav button {
-      margin: 5px 10px;
-      padding: 10px 20px;
-      background: #0284C7;
-      border: none;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    nav button:hover {
-      background: #0369A1;
-    }
-
-    .section {
-      display: none;
-      max-width: 900px;
-      margin: 30px auto;
-      background: #ffffff10;
-      padding: 20px;
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
-    }
-
-    .active {
-      display: block;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 4px;
-    }
-
-    button.action,
-    button.small {
-      background: #34d399;
-      margin-top: 10px;
-      border: none;
-      color: #000;
-      padding: 7px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button.action:hover,
-    button.small:hover {
-      background: #059669;
-      color: #fff;
-    }
-
-    #listings .post,
-    #profile-listings .post,
-    #profile-purchases .post,
-    #profile-wishlist .post,
-    #profile-cart .post {
-      background: #ffffff20;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    .famous-games {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .famous-games div {
-      flex: 1 1 45%;
-      background: #ffffff20;
-      padding: 10px;
-      border-radius: 8px;
-      color: #fff;
-    }
-
-    .gallery {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      margin: 10px 0;
-    }
-
-    .gallery img {
-      height: 100px;
-      border-radius: 5px;
-    }
-
-    video {
-      width: 100%;
-      max-height: 300px;
-      margin-top: 10px;
-      border-radius: 8px;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      background: #00000020;
-      padding: 10px;
-      border-radius: 8px;
-      color: #fff;
-    }
-
-    .inline-buttons button {
-      margin-right: 8px;
-      margin-top: 10px;
-      background: #3b82f6;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .inline-buttons button:hover {
-      background: #2563eb;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>GameVault - Login/Register</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: white;
+    margin: 0; padding: 0;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 10px;
+    width: 320px;
+  }
+  h2 {
+    text-align: center;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+  }
+  button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background: #34d399;
+    border: none;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  button:hover {
+    background: #059669;
+    color: white;
+  }
+  .toggle-link {
+    margin-top: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: #34d399;
+  }
+  .error {
+    color: #ff6666;
+    margin-top: 10px;
+  }
+</style>
 </head>
 <body>
-  <nav>
-    <button onclick="showSection('home')">🏠 Home</button>
-    <button onclick="showSection('marketplace')">🛒 Marketplace</button>
-    <button onclick="showSection('profile')">👤 My Profile</button>
-    <button onclick="showSection('auth')">🔐 Login / Register</button>
-    <button onclick="logout()" id="logoutBtn" style="display:none; background:#ef4444; color:#fff;">Logout</button>
-  </nav>
+  <div class="container">
+    <div id="login-form">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <div class="toggle-link" onclick="toggleForms()">Don't have an account? Register</div>
+      <div class="error" id="login-error"></div>
+    </div>
 
-  <!-- Home Section -->
-  <div id="home" class="section active">
-    <h2>🎮 Welcome to GameVault</h2>
-    <p>Buy and Sell Game Accounts in one place.</p>
-    <h3>🔥 Famous Games</h3>
-    <div class="famous-games">
-      <div><strong>PUBG Mobile</strong><br />Battle Royale, FPS</div>
-      <div><strong>Free Fire</strong><br />Battle Royale, Fast Action</div>
-      <div><strong>World of Tanks</strong><br />Tank Battles</div>
-      <div><strong>War Machines</strong><br />Tank PvP</div>
-      <div><strong>Call of Duty Mobile</strong><br />Shooter & Battle Royale</div>
-      <div><strong>Fortnite</strong><br />Battle Royale, Creative</div>
-      <div><strong>Shadowgun Legends</strong><br />Online RPG Shooter</div>
-      <div><strong>Pixel Gun 3D</strong><br />FPS with skins & modes</div>
-      <div><strong>Apex Legends</strong><br />Battle Royale Shooter</div>
-      <div><strong>Valorant</strong><br />Tactical FPS</div>
-      <div><strong>League of Legends</strong><br />MOBA</div>
-      <div><strong>CS:GO</strong><br />FPS Competitive</div>
-      <div><strong>Clash of Clans</strong><br />Strategy</div>
-      <div><strong>Among Us</strong><br />Social Deduction</div>
-      <div><strong>Minecraft</strong><br />Sandbox</div>
-      <div><strong>Roblox</strong><br />User Created Worlds</div>
-      <div><strong>Genshin Impact</strong><br />Open World RPG</div>
-      <div><strong>Destiny 2</strong><br />FPS MMO</div>
-      <div><strong>Rocket League</strong><br />Soccer with Cars</div>
-      <div><strong>Overwatch</strong><br />Team Shooter</div>
+    <div id="register-form" style="display:none;">
+      <h2>Register</h2>
+      <input type="text" id="register-nickname" placeholder="Nickname" />
+      <input type="email" id="register-email" placeholder="Email" />
+      <input type="password" id="register-password" placeholder="Password" />
+      <button onclick="register()">Register</button>
+      <div class="toggle-link" onclick="toggleForms()">Already have an account? Login</div>
+      <div class="error" id="register-error"></div>
     </div>
   </div>
 
-  <!-- Marketplace Section -->
-  <div id="marketplace" class="section">
-    <h2>🛒 Marketplace</h2>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-    <!-- Post form (shown only when logged in) -->
-    <div id="post-box" style="display:none;">
-      <h3>Post Your Game Account</h3>
-      <input type="text" id="gameTitle" placeholder="Game Title" required />
-      <textarea id="description" placeholder="Description" required></textarea>
-      <input type="number" id="price" placeholder="Price (USD)" required />
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
+    authDomain: "web-game-f7c50.firebaseapp.com",
+    projectId: "web-game-f7c50",
+    storageBucket: "web-game-f7c50.appspot.com",
+    messagingSenderId: "769692641635",
+    appId: "1:769692641635:web:94cf1c9f7ff5aa77a3cb56"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-      <label>Upload Images (required):</label>
-      <input type="file" id="images" accept="image/*" multiple required />
+  function toggleForms() {
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+    registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+    clearErrors();
+  }
+  function clearErrors() {
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('register-error').textContent = '';
+  }
 
-      <label>Upload Video (optional):</label>
-      <input type="file" id="video" accept="video/*" />
+  async function register() {
+    clearErrors();
+    const nickname = document.getElementById('register-nickname').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value.trim();
 
-      <input type="email" id="contactEmail" placeholder="Contact Email" required />
-      <input
-        type="text"
-        id="contactPhone"
-        placeholder="Contact Phone (e.g. +966...)"
-        required
-      />
-
-      <textarea
-        id="privateDetails"
-        placeholder="Private Login Details (email/pass, skins, etc)"
-        required
-      ></textarea>
-
-      <button class="action" onclick="createPost()">Post Account</button>
-    </div>
-
-    <!-- Listings -->
-    <div id="listings"></div>
-  </div>
-
-  <!-- Profile Section -->
-  <div id="profile" class="section">
-    <h2>👤 My Profile</h2>
-    <div id="profile-info">
-      <p><strong>Nickname:</strong> <span id="profile-nickname"></span></p>
-      <p><strong>Email:</strong> <span id="profile-email"></span></p>
-    </div>
-
-    <h3>Your Listings</h3>
-    <div id="profile-listings"></div>
-
-    <h3>Your Purchases</h3>
-    <div id="profile-purchases"></div>
-
-    <h3>Your Wishlist</h3>
-    <div id="profile-wishlist"></div>
-
-    <h3>Your Cart</h3>
-    <div id="profile-cart"></div>
-  </div>
-
-  <!-- Auth Section -->
-  <div id="auth" class="section">
-    <h2>🔐 Login / Register</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <input type="text" id="nickname" placeholder="Nickname (for register only)" />
-    <button class="action" onclick="register()">Register</button>
-    <button class="action" onclick="login()">Login</button>
-  </div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
-      authDomain: "web-game-f7c50.firebaseapp.com",
-      projectId: "web-game-f7c50",
-      storageBucket: "web-game-f7c50.appspot.com",
-      messagingSenderId: "769692641635",
-      appId: "1:769692641635:web:94cf1c9f7ff5aa77a3cb56",
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    let currentUser = null;
-    let currentUserData = null;
-
-    auth.onAuthStateChanged(async (user) => {
-      currentUser = user;
-      if (user) {
-        document.getElementById("post-box").style.display = "block";
-        document.getElementById("logoutBtn").style.display = "inline-block";
-        document.querySelector("nav button[onclick=\"showSection('auth')\"]").style.display = "none";
-
-        // Fetch user data from Firestore
-        const userDoc = await db.collection("users").doc(user.uid).get();
-        currentUserData = userDoc.exists ? userDoc.data() : null;
-        if (!currentUserData) {
-          // If no data, create blank
-          await db.collection("users").doc(user.uid).set({
-            nickname: "NoNickname",
-            wishlist: [],
-            cart: [],
-          });
-          currentUserData = {
-            nickname: "NoNickname",
-            wishlist: [],
-            cart: [],
-          };
-        } else {
-          if (!currentUserData.wishlist) currentUserData.wishlist = [];
-          if (!currentUserData.cart) currentUserData.cart = [];
-        }
-
-        loadPosts();
-        loadProfile();
-      } else {
-        document.getElementById("post-box").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "none";
-        document.querySelector("nav button[onclick=\"showSection('auth')\"]").style.display = "inline-block";
-        currentUserData = null;
-        loadPosts();
-        clearProfile();
-      }
-    });
-
-    async function register() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const nickname = document.getElementById("nickname").value.trim();
-      if (!email || !password || !nickname) return alert("Fill all fields");
-
-      auth
-        .createUserWithEmailAndPassword(email, password)
-        .then(async (cred) => {
-          await db.collection("users").doc(cred.user.uid).set({
-            nickname,
-            wishlist: [],
-            cart: [],
-          });
-          alert("✅ Registered!");
-        })
-        .catch((err) => alert("❌ " + err.message));
+    if (!nickname || !email || !password) {
+      document.getElementById('register-error').textContent = "All fields are required.";
+      return;
     }
 
-    function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (!email || !password) return alert("Fill all fields");
-
-      auth
-        .signInWithEmailAndPassword(email, password)
-        .then(() => alert("✅ Logged in!"))
-        .catch((err) => alert("❌ " + err.message));
-    }
-
-    function logout() {
-      auth.signOut();
-      showSection("home");
-    }
-
-    async function createPost() {
-      if (!currentUser) return alert("Please log in first.");
-
-      const title = document.getElementById("gameTitle").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const price = parseFloat(document.getElementById("price").value);
-      const privateDetails = document.getElementById("privateDetails").value.trim();
-      const contactEmail = document.getElementById("contactEmail").value.trim();
-      const contactPhone = document.getElementById("contactPhone").value.trim();
-      const imageFiles = document.getElementById("images").files;
-      const videoFile = document.getElementById("video").files[0];
-
-      if (
-        !title ||
-        !description ||
-        !price ||
-        !privateDetails ||
-        !contactEmail ||
-        !contactPhone ||
-        imageFiles.length === 0
-      ) {
-        alert("⚠️ Please fill all required fields and upload at least one image.");
-        return;
-      }
-
-      const nickname = currentUserData.nickname || "NoNickname";
-
-      // Upload images
-      const imageUrls = [];
-      for (let i = 0; i < imageFiles.length; i++) {
-        const ref = storage.ref().child("images/" + Date.now() + "_" + imageFiles[i].name);
-        await ref.put(imageFiles[i]);
-        const url = await ref.getDownloadURL();
-        imageUrls.push(url);
-      }
-
-      // Upload video
-      let videoUrl = "";
-      if (videoFile) {
-        const videoRef = storage.ref().child("videos/" + Date.now() + "_" + videoFile.name);
-        await videoRef.put(videoFile);
-        videoUrl = await videoRef.getDownloadURL();
-      }
-
-      await db.collection("posts").add({
-        title,
-        description,
-        price,
-        privateDetails,
-        contactEmail,
-        contactPhone,
-        imageUrls,
-        videoUrl,
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      await db.collection('users').doc(cred.user.uid).set({
         nickname,
-        uid: currentUser.uid,
-        createdAt: new Date(),
-        buyerUID: null,
+        wishlist: [],
+        cart: [],
       });
+      alert("✅ Registration successful! Please login.");
+      toggleForms();
+    } catch(e) {
+      document.getElementById('register-error').textContent = e.message;
+    }
+  }
 
-      alert("✅ Post created!");
-      clearPostForm();
-      loadPosts();
-      showSection("marketplace");
+  async function login() {
+    clearErrors();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+
+    if (!email || !password) {
+      document.getElementById('login-error').textContent = "Please fill both email and password.";
+      return;
     }
 
-    function clearPostForm() {
-      document.getElementById("gameTitle").value = "";
-      document.getElementById("description").value = "";
-      document.getElementById("price").value = "";
-      document.getElementById("privateDetails").value = "";
-      document.getElementById("contactEmail").value = "";
-      document.getElementById("contactPhone").value = "";
-      document.getElementById("images").value = "";
-      document.getElementById("video").value = "";
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      window.location.href = "home.html";
+    } catch(e) {
+      document.getElementById('login-error').textContent = e.message;
     }
-
-    async function loadPosts() {
-      const listings = document.getElementById("listings");
-      listings.innerHTML = "Loading...";
-
-      const snapshot = await db.collection("posts").orderBy("createdAt", "desc").get();
-      listings.innerHTML = "";
-
-      snapshot.forEach((doc) => {
-        const post = doc.data();
-        const id = doc.id;
-
-        const div = document.createElement("div");
-        div.className = "post";
-
-        // Image gallery
-        let galleryHtml = "";
-        if (post.imageUrls && post.imageUrls.length) {
-          galleryHtml = `<div class="gallery">` + post.imageUrls.map((url) => `<img src="${url}">`).join("") + `</div>`;
-        }
-
-        // Optional video
-        let videoHtml = "";
-        if (post.videoUrl) {
-          videoHtml = `
-            <video controls>
-              <source src="${post.videoUrl}" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          `;
-        }
-
-        let postHtml = `
-          <h4>${post.title} – $${post.price}</h4>
-          ${galleryHtml}
-          ${videoHtml}
-          <p>${post.description}</p>
-          <small>Posted by: <strong>${post.nickname}</strong></small><br><br>
-        `;
-
-        // Controls for current user
-        if (post.buyerUID === currentUser?.uid) {
-          postHtml += `
-            <strong>✅ Purchase Confirmed</strong><br>
-            <pre>${post.privateDetails || "No login details"}</pre>
-            <p>📧 ${post.contactEmail} | 📱 ${post.contactPhone}</p>
-          `;
-        } else if (post.buyerUID && post.buyerUID !== currentUser?.uid) {
-          postHtml += `<em>⚠️ Already Sold</em>`;
-        } else if (currentUser) {
-          postHtml += `
-            <p>📧 ${post.contactEmail} | 📱 ${post.contactPhone}</p>
-            <div class="inline-buttons">
-              <button onclick="addToWishlist('${id}')">➕ Add to Wishlist</button>
-              <button onclick="addToCart('${id}')">🛒 Add to Cart</button>
-              <button onclick="buyPost('${id}')">Buy Now</button>
-            </div>
-          `;
-        } else {
-          postHtml += `<small>🔐 Login to buy</small>`;
-        }
-
-        div.innerHTML = postHtml;
-        listings.appendChild(div);
-      });
-    }
-
-    async function buyPost(postId) {
-      if (!currentUser) return alert("Login first.");
-      const confirmed = confirm("Confirm purchase? You will see private login details.");
-      if (!confirmed) return;
-      await db.collection("posts").doc(postId).update({
-        buyerUID: currentUser.uid,
-      });
-      alert("✅ Purchase complete!");
-     // Show only one section at a time
-function showSection(id) {
-  const sections = document.querySelectorAll(".section");
-  sections.forEach((sec) => sec.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-// Clear profile info on logout
-function clearProfile() {
-  document.getElementById("profile-nickname").textContent = "";
-  document.getElementById("profile-email").textContent = "";
-  document.getElementById("profile-listings").innerHTML = "";
-  document.getElementById("profile-purchases").innerHTML = "";
-  document.getElementById("profile-wishlist").innerHTML = "";
-  document.getElementById("profile-cart").innerHTML = "";
-}
-
-// Add item to wishlist
-async function addToWishlist(postId) {
-  if (!currentUser) return alert("Login first.");
-  if (currentUserData.wishlist.includes(postId)) return alert("Already in wishlist");
-  
-  currentUserData.wishlist.push(postId);
-  await db.collection("users").doc(currentUser.uid).update({
-    wishlist: currentUserData.wishlist,
-  });
-  alert("Added to wishlist");
-  loadProfileWishlist();
-}
-
-// Add item to cart
-async function addToCart(postId) {
-  if (!currentUser) return alert("Login first.");
-  if (currentUserData.cart.includes(postId)) return alert("Already in cart");
-  
-  currentUserData.cart.push(postId);
-  await db.collection("users").doc(currentUser.uid).update({
-    cart: currentUserData.cart,
-  });
-  alert("Added to cart");
-  loadProfileCart();
-}
-
-// Remove item from wishlist
-async function removeFromWishlist(postId) {
-  if (!currentUser) return;
-  currentUserData.wishlist = currentUserData.wishlist.filter(id => id !== postId);
-  await db.collection("users").doc(currentUser.uid).update({
-    wishlist: currentUserData.wishlist,
-  });
-  loadProfileWishlist();
-}
-
-// Remove item from cart
-async function removeFromCart(postId) {
-  if (!currentUser) return;
-  currentUserData.cart = currentUserData.cart.filter(id => id !== postId);
-  await db.collection("users").doc(currentUser.uid).update({
-    cart: currentUserData.cart,
-  });
-  loadProfileCart();
-}
-
-// Load profile data: nickname, email, listings, purchases, wishlist, cart
-async function loadProfile() {
-  if (!currentUser) return;
-
-  document.getElementById("profile-nickname").textContent = currentUserData.nickname || "";
-  document.getElementById("profile-email").textContent = currentUser.email || "";
-
-  // Load user listings (posts by current user)
-  const listingsDiv = document.getElementById("profile-listings");
-  listingsDiv.innerHTML = "Loading...";
-  const userPostsSnap = await db.collection("posts").where("uid", "==", currentUser.uid).orderBy("createdAt", "desc").get();
-  listingsDiv.innerHTML = "";
-  if(userPostsSnap.empty) {
-    listingsDiv.textContent = "You have not posted any accounts yet.";
-  } else {
-    userPostsSnap.forEach(doc => {
-      const post = doc.data();
-      const id = doc.id;
-      const div = document.createElement("div");
-      div.className = "post";
-      div.innerHTML = `<h4>${post.title} - $${post.price}</h4>
-        <p>${post.description}</p>
-        <small>Posted on: ${post.createdAt?.toDate().toLocaleString() || ''}</small>
-        ${post.buyerUID ? `<p><strong>Sold to a buyer.</strong></p>` : `<p><em>Still available.</em></p>`}`;
-      listingsDiv.appendChild(div);
-    });
   }
-
-  // Load purchases (posts where buyerUID == currentUser.uid)
-  const purchasesDiv = document.getElementById("profile-purchases");
-  purchasesDiv.innerHTML = "Loading...";
-  const purchasesSnap = await db.collection("posts").where("buyerUID", "==", currentUser.uid).orderBy("createdAt", "desc").get();
-  purchasesDiv.innerHTML = "";
-  if(purchasesSnap.empty) {
-    purchasesDiv.textContent = "You have no purchases yet.";
-  } else {
-    purchasesSnap.forEach(doc => {
-      const post = doc.data();
-      const div = document.createElement("div");
-      div.className = "post";
-      div.innerHTML = `<h4>${post.title} - $${post.price}</h4>
-        <pre>${post.privateDetails}</pre>
-        <p>Contact: 📧 ${post.contactEmail} | 📱 ${post.contactPhone}</p>
-        <p>Purchased on: ${post.createdAt?.toDate().toLocaleString() || ''}</p>`;
-      purchasesDiv.appendChild(div);
-    });
-  }
-
-  await loadProfileWishlist();
-  await loadProfileCart();
-}
-
-// Load wishlist posts
-async function loadProfileWishlist() {
-  const wishlistDiv = document.getElementById("profile-wishlist");
-  wishlistDiv.innerHTML = "Loading...";
-  if (!currentUserData?.wishlist?.length) {
-    wishlistDiv.textContent = "Your wishlist is empty.";
-    return;
-  }
-
-  // Fetch all wishlist posts
-  const posts = [];
-  for (const id of currentUserData.wishlist) {
-    const doc = await db.collection("posts").doc(id).get();
-    if(doc.exists) posts.push({ id: doc.id, ...doc.data() });
-  }
-  wishlistDiv.innerHTML = "";
-  posts.forEach(post => {
-    const div = document.createElement("div");
-    div.className = "post";
-    div.innerHTML = `
-      <h4>${post.title} - $${post.price}</h4>
-      <p>${post.description}</p>
-      <button class="small" onclick="removeFromWishlist('${post.id}')">Remove from Wishlist</button>
-    `;
-    wishlistDiv.appendChild(div);
-  });
-}
-
-// Load cart posts
-async function loadProfileCart() {
-  const cartDiv = document.getElementById("profile-cart");
-  cartDiv.innerHTML = "Loading...";
-  if (!currentUserData?.cart?.length) {
-    cartDiv.textContent = "Your cart is empty.";
-    return;
-  }
-
-  const posts = [];
-  for (const id of currentUserData.cart) {
-    const doc = await db.collection("posts").doc(id).get();
-    if(doc.exists) posts.push({ id: doc.id, ...doc.data() });
-  }
-  cartDiv.innerHTML = "";
-  posts.forEach(post => {
-    const div = document.createElement("div");
-    div.className = "post";
-    div.innerHTML = `
-      <h4>${post.title} - $${post.price}</h4>
-      <p>${post.description}</p>
-      <button class="small" onclick="removeFromCart('${post.id}')">Remove from Cart</button>
-      <button class="small" onclick="buyPost('${post.id}')">Buy Now</button>
-    `;
-    cartDiv.appendChild(div);
-  });
-}
-
-// Finalize buyPost function
-async function buyPost(postId) {
-  if (!currentUser) return alert("Login first.");
-  const confirmed = confirm("Confirm purchase? You will see private login details.");
-  if (!confirmed) return;
-
-  // Check if post is already sold
-  const postDoc = await db.collection("posts").doc(postId).get();
-  if (!postDoc.exists) return alert("Post does not exist.");
-  const postData = postDoc.data();
-  if (postData.buyerUID) return alert("This account is already sold.");
-
-  await db.collection("posts").doc(postId).update({
-    buyerUID: currentUser.uid,
-  });
-
-  // Remove from wishlist/cart if present
-  if (currentUserData.wishlist.includes(postId)) {
-    currentUserData.wishlist = currentUserData.wishlist.filter(id => id !== postId);
-  }
-  if (currentUserData.cart.includes(postId)) {
-    currentUserData.cart = currentUserData.cart.filter(id => id !== postId);
-  }
-  await db.collection("users").doc(currentUser.uid).update({
-    wishlist: currentUserData.wishlist,
-    cart: currentUserData.cart,
-  });
-
-  alert("✅ Purchase complete!");
-  loadPosts();
-  loadProfile();
-  showSection("profile");
-}
-
-  </script>
+</script>
 </body>
 </html>
