@@ -1,66 +1,233 @@
-function loadMarketplace() {
-  const listingsDiv = document.getElementById("listings");
-  listingsDiv.innerHTML = "Loading...";
-
-  db.collection("posts").orderBy("createdAt", "desc").get().then(snapshot => {
-    listingsDiv.innerHTML = "";
-    if (snapshot.empty) {
-      listingsDiv.innerHTML = "<p>No listings available.</p>";
-      return;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GameVault Marketplace</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      margin: 0;
+      padding: 0;
     }
 
-    snapshot.forEach(doc => {
-      const post = doc.data();
-      const id = doc.id;
+    header {
+      background-color: #111;
+      padding: 20px;
+      text-align: center;
+    }
 
-      const div = document.createElement("div");
-      div.className = "listing";
+    header h1 {
+      margin: 0;
+      color: #38bdf8;
+    }
 
-      // Image gallery
-      let imagesHtml = "";
-      if (post.imageUrls && Array.isArray(post.imageUrls)) {
-        imagesHtml = `<div style="display: flex; overflow-x: auto; gap: 10px;">` +
-          post.imageUrls.map(url => `<img src="${url}" alt="Account Image" style="height:100px; border-radius:5px;">`).join("") +
-          `</div><br>`;
-      }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffff10;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+    }
 
-      // Optional video
-      let videoHtml = "";
-      if (post.videoUrl) {
-        videoHtml = `
-          <video controls style="width: 100%; max-height: 300px; margin-top: 10px; border-radius: 8px;">
-            <source src="${post.videoUrl}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>`;
-      }
+    .listing {
+      background: #ffffff15;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 8px;
+    }
 
-      let content = `
-        <h3>${post.title} – $${post.price}</h3>
-        ${imagesHtml}
-        ${videoHtml}
-        <p>${post.description}</p>
-        <small>Posted by: ${post.nickname}</small><br><br>
-      `;
+    .listing h3 {
+      margin-top: 0;
+    }
 
-      if (post.buyerUID === currentUser?.uid) {
-        content += `
-          <strong>✅ Purchase Confirmed</strong><br>
-          <p><strong>Login Info:</strong><br><pre style="white-space: pre-wrap;">${post.privateDetails || 'None'}</pre></p>
-          <p><strong>Contact:</strong> ${post.contactEmail || 'No email'} | 📱 ${post.contactPhone || 'No phone'}</p>
-        `;
-      } else if (post.buyerUID && post.buyerUID !== currentUser?.uid) {
-        content += `<p><em>⚠️ This account is already sold.</em></p>`;
-      } else if (currentUser) {
-        content += `
-          <p><strong>Contact:</strong> ${post.contactEmail || 'N/A'} | 📱 ${post.contactPhone || 'N/A'}</p>
-          <button class="buy-btn" onclick="confirmPurchase('${id}')">Buy Now</button>
-        `;
-      } else {
-        content += `<small>🔐 Login to buy</small>`;
-      }
+    .gallery {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      margin: 10px 0;
+    }
 
-      div.innerHTML = content;
-      listingsDiv.appendChild(div);
+    .gallery img {
+      height: 100px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    video {
+      max-width: 100%;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+
+    .buy-btn {
+      background-color: #10B981;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .buy-btn:hover {
+      background-color: #059669;
+    }
+
+    footer {
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin: 30px 0 10px;
+    }
+
+    a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    pre {
+      background: #00000020;
+      padding: 10px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🛒 GameVault Marketplace</h1>
+    <p>Browse & Buy Game Accounts Listed by Users</p>
+  </header>
+
+  <div class="container" id="marketplace">
+    <h2>Available Listings</h2>
+    <div id="listings">Loading...</div>
+  </div>
+
+  <footer>
+    <p><a href="index.html">← Back to Home</a></p>
+    <p>&copy; 2025 GameVault</p>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
+      authDomain: "web-game-f7c50.firebaseapp.com",
+      projectId: "web-game-f7c50",
+      storageBucket: "web-game-f7c50.appspot.com",
+      messagingSenderId: "769692641635",
+      appId: "1:769692641635:web:94cf1c9f7ff5aa77a3cb56"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      loadMarketplace();
     });
-  });
-}
+
+    function loadMarketplace() {
+      const listingsDiv = document.getElementById("listings");
+      listingsDiv.innerHTML = "Loading...";
+
+      db.collection("posts").orderBy("createdAt", "desc").get().then(snapshot => {
+        listingsDiv.innerHTML = "";
+        if (snapshot.empty) {
+          listingsDiv.innerHTML = "<p>No listings available.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const post = doc.data();
+          const id = doc.id;
+
+          const div = document.createElement("div");
+          div.className = "listing";
+
+          // Image gallery
+          let imagesHtml = "";
+          if (post.imageUrls && Array.isArray(post.imageUrls)) {
+            imagesHtml = '<div class="gallery">' +
+              post.imageUrls.map(url => `<img src="${url}" alt="Image">`).join('') +
+              '</div>';
+          }
+
+          // Optional video
+          let videoHtml = "";
+          if (post.videoUrl) {
+            videoHtml = `
+              <video controls>
+                <source src="${post.videoUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            `;
+          }
+
+          let content = `
+            <h3>${post.title} – $${post.price}</h3>
+            ${imagesHtml}
+            ${videoHtml}
+            <p>${post.description}</p>
+            <small>Posted by: ${post.nickname}</small><br><br>
+          `;
+
+          if (post.buyerUID === currentUser?.uid) {
+            content += `
+              <strong>✅ Purchase Confirmed</strong><br>
+              <p><strong>Login Info:</strong></p>
+              <pre>${post.privateDetails || 'None'}</pre>
+              <p><strong>Contact:</strong> ${post.contactEmail || 'N/A'} | 📱 ${post.contactPhone || 'N/A'}</p>
+            `;
+          } else if (post.buyerUID && post.buyerUID !== currentUser?.uid) {
+            content += `<p><em>⚠️ This account is already sold.</em></p>`;
+          } else if (currentUser) {
+            content += `
+              <p><strong>Contact:</strong> ${post.contactEmail || 'N/A'} | 📱 ${post.contactPhone || 'N/A'}</p>
+              <button class="buy-btn" onclick="confirmPurchase('${id}')">Buy Now</button>
+            `;
+          } else {
+            content += `<small>🔐 Login to buy</small>`;
+          }
+
+          div.innerHTML = content;
+          listingsDiv.appendChild(div);
+        });
+      });
+    }
+
+    function confirmPurchase(postId) {
+      if (!currentUser) return alert("You must log in first.");
+
+      const confirmed = confirm("Do you want to buy this account? After confirming, you will see its login info.");
+      if (!confirmed) return;
+
+      db.collection("posts").doc(postId).update({
+        buyerUID: currentUser.uid
+      }).then(() => {
+        alert("✅ Purchase successful. Details will now be visible.");
+        loadMarketplace();
+      }).catch(err => {
+        alert("❌ Error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
