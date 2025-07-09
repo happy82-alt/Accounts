@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GameVault – Game Marketplace</title>
+  <title>GameVault – Game Account Marketplace</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
 
     .section {
       display: none;
-      max-width: 600px;
+      max-width: 800px;
       margin: 30px auto;
       background: #ffffff10;
       padding: 20px;
@@ -65,27 +65,58 @@
       padding: 10px;
       border-radius: 8px;
     }
+
+    .famous-games {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .famous-games div {
+      flex: 1 1 45%;
+      background: #ffffff20;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    h2, h3, h4, p, small {
+      color: #fff;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Tabs -->
+  <!-- Navigation -->
   <nav>
     <button onclick="showSection('home')">🏠 Home</button>
     <button onclick="showSection('marketplace')">🛒 Marketplace</button>
     <button onclick="showSection('auth')">🔐 Login / Register</button>
   </nav>
 
-  <!-- Sections -->
+  <!-- Home Section -->
   <div id="home" class="section active">
     <h2>🎮 Welcome to GameVault</h2>
     <p>Buy and Sell Game Accounts in one place.</p>
+
+    <h3>🔥 Famous Games</h3>
+    <div class="famous-games">
+      <div><strong>PUBG Mobile</strong><br>Battle Royale, FPS</div>
+      <div><strong>Free Fire</strong><br>Battle Royale, Fast Action</div>
+      <div><strong>World of Tanks</strong><br>Tank Battles</div>
+      <div><strong>War Machines</strong><br>Tank PvP</div>
+      <div><strong>Call of Duty Mobile</strong><br>Shooter & Battle Royale</div>
+      <div><strong>Fortnite</strong><br>Battle Royale, Creative</div>
+      <div><strong>Shadowgun Legends</strong><br>Online RPG Shooter</div>
+      <div><strong>Pixel Gun 3D</strong><br>FPS with skins & modes</div>
+    </div>
   </div>
 
+  <!-- Marketplace Section -->
   <div id="marketplace" class="section">
     <h2>🛒 Marketplace</h2>
 
-    <!-- Post form (only if logged in) -->
+    <!-- Post form -->
     <div id="post-box" style="display:none;">
       <h3>Post Your Game Account</h3>
       <input type="text" id="gameTitle" placeholder="Game Title">
@@ -98,6 +129,7 @@
     <div id="listings"></div>
   </div>
 
+  <!-- Auth Section -->
   <div id="auth" class="section">
     <h2>🔐 Login / Register</h2>
     <input type="email" id="email" placeholder="Email">
@@ -114,7 +146,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
       authDomain: "web-game-f7c50.firebaseapp.com",
@@ -128,7 +159,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Auth functions
     function register() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -153,14 +183,13 @@
       auth.signOut();
     }
 
-    // Post
     function createPost() {
       const gameTitle = document.getElementById("gameTitle").value;
       const description = document.getElementById("description").value;
       const price = parseFloat(document.getElementById("price").value);
       const user = auth.currentUser;
 
-      if (!user) return alert("You must log in.");
+      if (!user) return alert("Please log in.");
 
       db.collection("users").doc(user.uid).get().then(doc => {
         const nickname = doc.data().nickname;
@@ -178,7 +207,6 @@
       }).catch(err => alert("❌ " + err.message));
     }
 
-    // Load all posts
     function loadPosts() {
       const listings = document.getElementById("listings");
       listings.innerHTML = "";
@@ -198,18 +226,15 @@
       });
     }
 
-    // Show/hide sections
     function showSection(id) {
       document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     }
 
-    // Auth listener
     auth.onAuthStateChanged(user => {
       document.getElementById("post-box").style.display = user ? "block" : "none";
     });
 
-    // Load posts at start
     loadPosts();
   </script>
 </body>
