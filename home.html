@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>GameVault – Home Dashboard</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: white;
+  }
+  nav {
+    background: #111;
+    padding: 15px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: #0284C7;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    white-space: nowrap;
+  }
+  nav button:hover {
+    background: #0369A1;
+  }
+  .section {
+    display: none;
+    max-width: 960px;
+    margin: 20px auto;
+    background: rgba(255 255 255 / 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+  }
+  .active {
+    display: block;
+  }
+  input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: none;
+  }
+  button.action {
+    background: #34D399;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 7px;
+    font-weight: bold;
+    cursor: pointer;
+    color: black;
+    margin-top: 15px;
+  }
+  button.action:hover {
+    background: #059669;
+    color: white;
+  }
+  .post-card {
+    background: rgba(255 255 255 / 0.2);
+    margin-bottom: 15px;
+    border-radius: 10px;
+    padding: 15px;
+  }
+  .gallery {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-top: 10px;
+  }
+  .gallery img {
+    height: 80px;
+    border-radius: 6px;
+  }
+  video {
+    width: 100%;
+    max-height: 240px;
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+  label {
+    font-weight: bold;
+  }
+  .filter-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .filter-row > * {
+    flex: 1;
+    min-width: 120px;
+  }
+  .small-btn {
+    background: #3b82f6;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    margin-top: 8px;
+  }
+  .small-btn:hover {
+    background: #2563eb;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <button onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('profile')">My Profile</button>
+  <button onclick="showSection('sell')">Sell Account</button>
+  <button onclick="showSection('marketplace')">Marketplace</button>
+  <button onclick="logout()" style="background:#ef4444;">Logout</button>
+</nav>
+
+<!-- Dashboard -->
+<div id="dashboard" class="section active">
+  <h2>Welcome, <span id="user-nickname">User</span>!</h2>
+  <p>This is your dashboard. Use the navigation to access your profile, sell your account, or browse the marketplace.</p>
+</div>
+
+<!-- Profile Section -->
+<div id="profile" class="section">
+  <h2>My Profile</h2>
+  <form id="profile-form">
+    <label>Nickname</label>
+    <input type="text" id="profile-nickname" required />
+
+    <label>Email (cannot change)</label>
+    <input type="email" id="profile-email" disabled />
+
+    <label>WhatsApp Number</label>
+    <input type="text" id="profile-whatsapp" placeholder="+966..." />
+
+    <button type="submit" class="action">Update Profile</button>
+  </form>
+  <div id="profile-msg" style="margin-top: 10px;"></div>
+</div>
+
+<!-- Sell Account Section -->
+<div id="sell" class="section">
+  <h2>Sell Your Game Account</h2>
+  <form id="sell-form" enctype="multipart/form-data">
+    <label>Game Title</label>
+    <input type="text" id="sell-title" placeholder="Game name" required />
+
+    <label>Level</label>
+    <input type="number" id="sell-level" min="1" placeholder="Level" required />
+
+    <label>Rank</label>
+    <input type="text" id="sell-rank" placeholder="Rank" required />
+
+    <label>Season Played</label>
+    <input type="text" id="sell-season" placeholder="E.g. Season 8" required />
+
+    <label>Description</label>
+    <textarea id="sell-description" placeholder="Description of account" required></textarea>
+
+    <label>Upload Images (minimum 1)</label>
+    <input type="file" id="sell-images" accept="image/*" multiple required />
+
+    <label>Upload Video (mandatory, 1-5 minutes)</label>
+    <input type="file" id="sell-video" accept="video/*" required />
+
+    <label>Price (USD)</label>
+    <input type="number" id="sell-price" min="1" step="0.01" placeholder="Price in USD" required />
+
+    <label>Seller Name</label>
+    <input type="text" id="sell-sellername" required />
+
+    <label>Contact Email</label>
+    <input type="email" id="sell-email" required />
+
+    <label>WhatsApp Number</label>
+    <input type="text" id="sell-whatsapp" placeholder="+966..." required />
+
+    <button type="submit" class="action">Post Account</button>
+  </form>
+  <div id="sell-msg" style="margin-top: 10px;"></div>
+</div>
+
+<!-- Marketplace Section -->
+<div id="marketplace" class="section">
+  <h2>Marketplace</h2>
+
+  <div class="filter-row">
+    <input type="text" id="filter-title" placeholder="Filter by Game Title" />
+    <input type="text" id="filter-rank" placeholder="Filter by Rank" />
+    <input type="number" id="filter-level" placeholder="Filter by Minimum Level" min="1" />
+    <button class="small-btn" onclick="applyFilters()">Apply Filters</button>
+    <button class="small-btn" onclick="clearFilters()">Clear Filters</button>
+  </div>
+
+  <div id="marketplace-list"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
+    authDomain: "web-game-f7c50.firebaseapp.com",
+    projectId: "web-game-f7c50",
+    storageBucket: "web-game-f7c50.appspot.com",
+    messagingSenderId: "769692641635",
+    appId: "1:769692641635:web:94cf1c9f7ff5aa77a3cb56",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  let currentUser = null;
+  let currentUserData = null;
+
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      // Not logged in, redirect to index.html
+      window.location.href = "index.html";
+      return;
+    }
+    currentUser = user;
+
+    // Load user data
+    const doc = await db.collection("users").doc(user.uid).get();
+    currentUserData = doc.exists ? doc.data() : {};
+    if (!currentUserData.whatsapp) currentUserData.whatsapp = "";
+
+    // Show nickname in dashboard
+    document.getElementById("user-nickname").textContent = currentUserData.nickname || "User";
+
+    // Fill profile form
+    document.getElementById("profile-nickname").value = currentUserData.nickname || "";
+    document.getElementById("profile-email").value = user.email;
+    document.getElementById("profile-whatsapp").value = currentUserData.whatsapp || "";
+
+    // Load marketplace listings
+    loadMarketplace();
+  });
+
+  function showSection(id) {
+    document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  document.getElementById("profile-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nickname = document.getElementById("profile-nickname").value.trim();
+    const whatsapp = document.getElementById("profile-whatsapp").value.trim();
+
+    if (!nickname) {
+      showProfileMsg("Nickname is required", true);
+      return;
+    }
+    await db.collection("users").doc(currentUser.uid).update({ nickname, whatsapp });
+    showProfileMsg("Profile updated!", false);
+    // Update dashboard nickname too
+    document.getElementById("user-nickname").textContent = nickname;
+  });
+
+  function showProfileMsg(msg, isError) {
+    const el = document.getElementById("profile-msg");
+    el.textContent = msg;
+    el.style.color = isError ? "red" : "lightgreen";
+    setTimeout(() => (el.textContent = ""), 3000);
+  }
+
+  // Sell Account Form Submit
+  document.getElementById("sell-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearSellMsg();
+
+    const title = document.getElementById("sell-title").value.trim();
+    const level = parseInt(document.getElementById("sell-level").value);
+    const rank = document.getElementById("sell-rank").value.trim();
+    const season = document.getElementById("sell-season").value.trim();
+    const description = document.getElementById("sell-description").value.trim();
+    const images = document.getElementById("sell-images").files;
+    const video = document.getElementById("sell-video").files[0];
+    const price = parseFloat(document.getElementById("sell-price").value);
+    const sellerName = document.getElementById("sell-sellername").value.trim();
+    const contactEmail = document.getElementById("sell-email").value.trim();
+    const whatsapp = document.getElementById("sell-whatsapp").value.trim();
+
+    if (!title || !level || !rank || !season || !description || !images.length || !video || !price || !sellerName || !contactEmail || !whatsapp) {
+      showSellMsg("Please fill all required fields.", true);
+      return;
+    }
+
+    // Validate video duration (1-5 minutes)
+    const videoUrl = URL.createObjectURL(video);
+    const videoElement = document.createElement("video");
+    videoElement.src = videoUrl;
+    videoElement.preload = "metadata";
+
+    videoElement.onloadedmetadata = async () => {
+      const duration = videoElement.duration;
+      URL.revokeObjectURL(videoUrl);
+
+      if (duration < 60 || duration > 300) {
+        showSellMsg("Video length must be between 1 and 5 minutes.", true);
+        return;
+      }
+
+      // Upload images
+      const imageUrls = [];
+      for (let i = 0; i < images.length; i++) {
+        const imgRef = storage.ref().child(`images/${Date.now()}_${images[i].name}`);
+        await imgRef.put(images[i]);
+        const url = await imgRef.getDownloadURL();
+        imageUrls.push(url);
+      }
+
+      // Upload video
+      const videoRef = storage.ref().child(`videos/${Date.now()}_${video.name}`);
+      await videoRef.put(video);
+      const videoURL = await videoRef.getDownloadURL();
+
+      // Save post in Firestore
+      await db.collection("posts").add({
+        title,
+        level,
+        rank,
+        season,
+        description,
+        imageUrls,
+        videoURL,
+        price,
+        sellerName,
+        contactEmail,
+        whatsapp,
+        createdAt: new Date(),
+        sellerUID: currentUser.uid,
+      });
+
+      showSellMsg("✅ Account posted!", false);
+      document.getElementById("sell-form").reset();
+      loadMarketplace();
+    };
+  });
+
+  function showSellMsg(msg, isError) {
+    const el = document.getElementById("sell-msg");
+    el.textContent = msg;
+    el.style.color = isError ? "red" : "lightgreen";
+    setTimeout(() => (el.textContent = ""), 3000);
+  }
+  function clearSellMsg() {
+    document.getElementById("sell-msg").textContent = "";
+  }
+
+  async function loadMarketplace(filters = {}) {
+    const container = document.getElementById("marketplace-list");
+    container.innerHTML = "Loading...";
+    let ref = db.collection("posts").orderBy("createdAt", "desc");
+
+    const snapshot = await ref.get();
+    container.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+      const post = doc.data();
+      const id = doc.id;
+
+      if (
+        (filters.title && !post.title.toLowerCase().includes(filters.title)) ||
+        (filters.rank && !post.rank.toLowerCase().includes(filters.rank)) ||
+        (filters.level && post.level < filters.level)
+      ) return;
+
+      const div = document.createElement("div");
+      div.className = "post-card";
+
+      let imagesHTML = "";
+      if (post.imageUrls && post.imageUrls.length) {
+        imagesHTML = `<div class="gallery">` + post.imageUrls.map(url => `<img src="${url}">`).join('') + `</div>`;
+      }
+
+      const videoHTML = post.videoURL ? `<video controls src="${post.videoURL}"></video>` : "";
+
+      div.innerHTML = `
+        <h3>${post.title} – $${post.price}</h3>
+        ${imagesHTML}
+        ${videoHTML}
+        <p><strong>Level:</strong> ${post.level}, <strong>Rank:</strong> ${post.rank}, <strong>Season:</strong> ${post.season}</p>
+        <p>${post.description}</p>
+        <p>📧 ${post.contactEmail}<br>📱 ${post.whatsapp}</p>
+        <p><strong>Seller:</strong> ${post.sellerName}</p>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function applyFilters() {
+    const title = document.getElementById("filter-title").value.trim().toLowerCase();
+    const rank = document.getElementById("filter-rank").value.trim().toLowerCase();
+    const level = parseInt(document.getElementById("filter-level").value);
+    const filters = {
+      title,
+      rank,
+      level: isNaN(level) ? null : level,
+    };
+    loadMarketplace(filters);
+  }
+
+  function clearFilters() {
+    document.getElementById("filter-title").value = "";
+    document.getElementById("filter-rank").value = "";
+    document.getElementById("filter-level").value = "";
+    loadMarketplace();
+  }
+
+  function logout() {
+    auth.signOut();
+  }
+</script>
+</body>
+</html>
