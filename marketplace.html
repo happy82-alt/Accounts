@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GameVault Marketplace</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #111;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      color: #38bdf8;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffff10;
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+    }
+
+    .listing {
+      background: #ffffff15;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .listing h3 {
+      margin: 0 0 10px 0;
+    }
+
+    .listing p {
+      margin: 0 0 5px 0;
+    }
+
+    .listing small {
+      color: #ccc;
+    }
+
+    .buy-btn {
+      background-color: #10B981;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .buy-btn:hover {
+      background-color: #059669;
+    }
+
+    footer {
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin: 30px 0 10px;
+    }
+
+    a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🛒 GameVault Marketplace</h1>
+    <p>Browse & Buy Game Accounts Listed by Users</p>
+  </header>
+
+  <div class="container" id="marketplace">
+    <h2>Available Listings</h2>
+    <div id="listings">Loading...</div>
+  </div>
+
+  <footer>
+    <p><a href="index.html">← Back to Home</a></p>
+    <p>&copy; 2025 GameVault</p>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
+      authDomain: "web-game-f7c50.firebaseapp.com",
+      projectId: "web-game-f7c50",
+      storageBucket: "web-game-f7c50.firebasestorage.app",
+      messagingSenderId: "769692641635",
+      appId: "1:769692641635:web:94cf1c9f7ff5aa77a3cb56"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      loadMarketplace();
+    });
+
+    function loadMarketplace() {
+      const listingsDiv = document.getElementById("listings");
+      listingsDiv.innerHTML = "Loading...";
+
+      db.collection("posts").orderBy("createdAt", "desc").get().then(snapshot => {
+        listingsDiv.innerHTML = "";
+        if (snapshot.empty) {
+          listingsDiv.innerHTML = "<p>No listings available.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const post = doc.data();
+          const id = doc.id;
+
+          const div = document.createElement("div");
+          div.className = "listing";
+
+          let content = `
+            <h3>${post.title} – $${post.price}</h3>
+            <p>${post.description}</p>
+            <small>Posted by: ${post.nickname}</small><br><br>
+          `;
+
+          if (post.buyerUID === currentUser?.uid) {
+            content += `
+              <strong>✅ Purchase Confirmed</strong><br>
+              <p><strong>Login Info:</strong> ${post.privateDetails || 'None'}</p>
+            `;
+          } else if (post.buyerUID && post.buyerUID !== currentUser?.uid) {
+            content += `<p><em>⚠️ This account is already sold.</em></p>`;
+          } else if (currentUser) {
+            content += `<button class="buy-btn" onclick="confirmPurchase('${id}')">Buy Now</button>`;
+          } else {
+            content += `<small>🔐 Login to buy</small>`;
+          }
+
+          div.innerHTML = content;
+          listingsDiv.appendChild(div);
+        });
+      });
+    }
+
+    function confirmPurchase(postId) {
+      if (!currentUser) return alert("You must log in first.");
+
+      const confirmed = confirm("Do you want to buy this account? After confirming, you will see its login info.");
+      if (!confirmed) return;
+
+      db.collection("posts").doc(postId).update({
+        buyerUID: currentUser.uid
+      }).then(() => {
+        alert("✅ Purchase successful. Details will now be visible.");
+        loadMarketplace();
+      }).catch(err => {
+        alert("❌ Error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
