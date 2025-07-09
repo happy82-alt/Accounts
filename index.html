@@ -2,41 +2,110 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GameVault – Game Account Marketplace</title>
+  <title>GameVault – Game Marketplace</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-    .box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
-    button { padding: 10px 15px; background-color: #0284C7; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #0369A1; }
-    h2, h3 { color: #222; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(to right, #1e3c72, #2a5298);
+      color: #fff;
+    }
+
+    nav {
+      background: #111;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      background: #0284C7;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    nav button:hover {
+      background: #0369A1;
+    }
+
+    .section {
+      display: none;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #ffffff10;
+      padding: 20px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+    }
+
+    .active {
+      display: block;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+    }
+
+    button.action {
+      background: #34D399;
+      margin-top: 10px;
+    }
+
+    #listings .post {
+      background: #ffffff20;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>🎮 GameVault – Buy & Sell Game Accounts</h2>
+  <!-- Navigation Tabs -->
+  <nav>
+    <button onclick="showSection('home')">🏠 Home</button>
+    <button onclick="showSection('marketplace')">🛒 Marketplace</button>
+    <button onclick="showSection('auth')">🔐 Login / Register</button>
+  </nav>
 
-  <div class="box" id="auth-box">
-    <h3>Login / Register</h3>
+  <!-- Sections -->
+  <div id="home" class="section active">
+    <h2>🎮 Welcome to GameVault</h2>
+    <p>Buy and Sell Game Accounts in one place.</p>
+  </div>
+
+  <div id="marketplace" class="section">
+    <h2>🛒 Marketplace</h2>
+
+    <!-- Post form (only if logged in) -->
+    <div id="post-box" style="display:none;">
+      <h3>Post Your Game Account</h3>
+      <input type="text" id="gameTitle" placeholder="Game Title">
+      <textarea id="description" placeholder="Description"></textarea>
+      <input type="number" id="price" placeholder="Price (USD)">
+      <button class="action" onclick="createPost()">Post</button>
+    </div>
+
+    <!-- Listings -->
+    <div id="listings"></div>
+  </div>
+
+  <div id="auth" class="section">
+    <h2>🔐 Login / Register</h2>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <input type="text" id="nickname" placeholder="Nickname (only for registration)">
-    <button onclick="register()">Register</button>
-    <button onclick="login()">Login</button>
-    <button onclick="logout()">Logout</button>
-  </div>
-
-  <div class="box" id="post-box" style="display:none;">
-    <h3>Post a Game Account</h3>
-    <input type="text" id="gameTitle" placeholder="Game Title">
-    <textarea id="description" placeholder="Account Description"></textarea>
-    <input type="number" id="price" placeholder="Price (USD)">
-    <button onclick="createPost()">Submit Listing</button>
-  </div>
-
-  <div class="box">
-    <h3>🛒 Marketplace Listings</h3>
-    <div id="listings"></div>
+    <input type="text" id="nickname" placeholder="Nickname (for register only)">
+    <button class="action" onclick="register()">Register</button>
+    <button class="action" onclick="login()">Login</button>
+    <button class="action" onclick="logout()">Logout</button>
   </div>
 
   <!-- Firebase SDKs -->
@@ -45,7 +114,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase config from your project
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
       authDomain: "web-game-f7c50.firebaseapp.com",
@@ -55,48 +124,43 @@
       appId: "1:769692641635:web:94cf1c9f7ff5aa77a3cb56"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Register function
+    // Auth functions
     function register() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const nickname = document.getElementById("nickname").value;
 
       auth.createUserWithEmailAndPassword(email, password)
-        .then((userCred) => {
-          return db.collection("users").doc(userCred.user.uid).set({ nickname });
-        })
-        .then(() => alert("✅ Registered successfully!"))
-        .catch(error => alert("❌ " + error.message));
+        .then((userCred) => db.collection("users").doc(userCred.user.uid).set({ nickname }))
+        .then(() => alert("✅ Registered!"))
+        .catch(err => alert("❌ " + err.message));
     }
 
-    // Login function
     function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
       auth.signInWithEmailAndPassword(email, password)
         .then(() => alert("✅ Logged in!"))
-        .catch(error => alert("❌ " + error.message));
+        .catch(err => alert("❌ " + err.message));
     }
 
-    // Logout
     function logout() {
       auth.signOut();
     }
 
-    // Create a new post
+    // Post
     function createPost() {
       const gameTitle = document.getElementById("gameTitle").value;
       const description = document.getElementById("description").value;
       const price = parseFloat(document.getElementById("price").value);
       const user = auth.currentUser;
 
-      if (!user) return alert("Please log in to post.");
+      if (!user) return alert("You must log in.");
 
       db.collection("users").doc(user.uid).get().then(doc => {
         const nickname = doc.data().nickname;
@@ -114,7 +178,7 @@
       }).catch(err => alert("❌ " + err.message));
     }
 
-    // Load marketplace posts
+    // Load all posts
     function loadPosts() {
       const listings = document.getElementById("listings");
       listings.innerHTML = "";
@@ -122,24 +186,30 @@
       db.collection("posts").orderBy("createdAt", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
           const post = doc.data();
-          const box = document.createElement("div");
-          box.className = "box";
-          box.innerHTML = `
+          const postDiv = document.createElement("div");
+          postDiv.className = "post";
+          postDiv.innerHTML = `
             <h4>${post.title} – $${post.price}</h4>
             <p>${post.description}</p>
             <small>Posted by: <strong>${post.nickname}</strong></small>
           `;
-          listings.appendChild(box);
+          listings.appendChild(postDiv);
         });
       });
     }
 
-    // Auth state listener
+    // Show/hide sections
+    function showSection(id) {
+      document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    // Auth listener
     auth.onAuthStateChanged(user => {
       document.getElementById("post-box").style.display = user ? "block" : "none";
     });
 
-    // Initial load
+    // Load posts at start
     loadPosts();
   </script>
 </body>
