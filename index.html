@@ -2,13 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GameVault - Web Game Marketplace</title>
+  <title>GameVault – Game Account Marketplace</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-    .box { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 0 10px #ccc; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
     button { padding: 10px 15px; background-color: #0284C7; color: white; border: none; border-radius: 4px; cursor: pointer; }
     button:hover { background-color: #0369A1; }
+    h2, h3 { color: #222; }
   </style>
 </head>
 <body>
@@ -29,12 +30,12 @@
     <h3>Post a Game Account</h3>
     <input type="text" id="gameTitle" placeholder="Game Title">
     <textarea id="description" placeholder="Account Description"></textarea>
-    <input type="number" id="price" placeholder="Price in USD">
+    <input type="number" id="price" placeholder="Price (USD)">
     <button onclick="createPost()">Submit Listing</button>
   </div>
 
   <div class="box">
-    <h3>Marketplace Listings</h3>
+    <h3>🛒 Marketplace Listings</h3>
     <div id="listings"></div>
   </div>
 
@@ -44,7 +45,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Your Firebase config
+    // Firebase config from your project
     const firebaseConfig = {
       apiKey: "AIzaSyDYSOFzd9SK0XrVnaUfVCRawLCJFD3GijI",
       authDomain: "web-game-f7c50.firebaseapp.com",
@@ -59,7 +60,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Register
+    // Register function
     function register() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -69,18 +70,18 @@
         .then((userCred) => {
           return db.collection("users").doc(userCred.user.uid).set({ nickname });
         })
-        .then(() => alert("Registered successfully!"))
-        .catch(error => alert(error.message));
+        .then(() => alert("✅ Registered successfully!"))
+        .catch(error => alert("❌ " + error.message));
     }
 
-    // Login
+    // Login function
     function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => alert("Logged in successfully!"))
-        .catch(error => alert(error.message));
+        .then(() => alert("✅ Logged in!"))
+        .catch(error => alert("❌ " + error.message));
     }
 
     // Logout
@@ -88,14 +89,14 @@
       auth.signOut();
     }
 
-    // Post Creation
+    // Create a new post
     function createPost() {
       const gameTitle = document.getElementById("gameTitle").value;
       const description = document.getElementById("description").value;
       const price = parseFloat(document.getElementById("price").value);
       const user = auth.currentUser;
 
-      if (!user) return alert("You must be logged in.");
+      if (!user) return alert("Please log in to post.");
 
       db.collection("users").doc(user.uid).get().then(doc => {
         const nickname = doc.data().nickname;
@@ -108,12 +109,12 @@
           createdAt: new Date()
         });
       }).then(() => {
-        alert("Post created!");
+        alert("✅ Post created!");
         loadPosts();
-      }).catch(err => alert(err.message));
+      }).catch(err => alert("❌ " + err.message));
     }
 
-    // Load All Posts
+    // Load marketplace posts
     function loadPosts() {
       const listings = document.getElementById("listings");
       listings.innerHTML = "";
@@ -124,21 +125,21 @@
           const box = document.createElement("div");
           box.className = "box";
           box.innerHTML = `
-            <h4>${post.title} - $${post.price}</h4>
+            <h4>${post.title} – $${post.price}</h4>
             <p>${post.description}</p>
-            <small>Posted by: ${post.nickname}</small>
+            <small>Posted by: <strong>${post.nickname}</strong></small>
           `;
           listings.appendChild(box);
         });
       });
     }
 
-    // Auth State Listener
+    // Auth state listener
     auth.onAuthStateChanged(user => {
       document.getElementById("post-box").style.display = user ? "block" : "none";
     });
 
-    // Load on Start
+    // Initial load
     loadPosts();
   </script>
 </body>
